@@ -25,14 +25,14 @@ class JetsonGPUMonitor:
     def get_gpu_info(self):
         stats = self.jetson.stats
         gpu_util = stats['GPU']
-        ram_info = stats['RAM']
-        power = stats['power']['GPU']
+        ram_info = self.jetson.memory['RAM']
+        power = stats['Power TOT']
         temperature = stats['Temp GPU']
         timestamp = time.time()
         info = {
             'GPU Utilization (%)': gpu_util,
             'Total Memory (bytes)': ram_info['tot'],
-            'Used Memory (bytes)': ram_info['use'],
+            'Used Memory (bytes)': ram_info['used'],
             'Free Memory (bytes)': ram_info['free'],
             'Power Usage (mW)': power,
             'Temperature (C)': temperature
@@ -60,3 +60,12 @@ class JetsonGPUMonitor:
     def cleanup(self):
         self.jetson.close()
         print("Shutdown jtop")
+
+
+if __name__ == "__main__":
+    monitor = JetsonGPUMonitor(interval = 0.5, filename = 'test.log')
+    monitor.start_monitoring()
+    time.sleep(3)
+    monitor.stop_monitoring()
+    monitor.cleanup()
+    
